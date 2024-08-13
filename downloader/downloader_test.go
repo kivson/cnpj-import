@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"os"
+	"path"
 	"testing"
 
 	"github.com/cavaliergopher/grab/v3"
@@ -49,17 +50,31 @@ func TestDownloadFile(t *testing.T) {
 		io.Copy(res, file)
 	}))
 	defer func() { testServer.Close() }()
+	destination := "../tests/test_download/"
+	fName := "/teste.zip"
+
+	os.Remove(path.Join(destination, fName))
+
 	downloader := Downloader{
 		HttpClient: &http.Client{},
 		Graber:     grab.NewClient(),
 		BaseUrl:    testServer.URL,
-		Dest:       "../tests/test_download/",
+		Dest:       destination,
 	}
 	bar := progressbar.DefaultBytes(int64(10000), "Tests downlolad")
-	downloader.downloadFile(testServer.URL+"/teste.zip", bar.Add)
+	downloader.downloadFile(testServer.URL+fName, bar.Add)
+
+	_, err := os.Stat(path.Join(destination, fName))
+	assert.Nil(t, err)
+	os.Remove(path.Join(destination, fName))
 }
 
 func TestDownloadRealFile(t *testing.T) {
+	destination := "../tests/test_download/"
+	fName := "/Cnaes.zip"
+
+	os.Remove(path.Join(destination, fName))
+
 	downloader := Downloader{
 		HttpClient: &http.Client{},
 		Graber:     grab.NewClient(),
@@ -67,4 +82,8 @@ func TestDownloadRealFile(t *testing.T) {
 	}
 	bar := progressbar.DefaultBytes(int64(10000), "Tests downlolad")
 	downloader.downloadFile("https://dadosabertos.rfb.gov.br/CNPJ/Cnaes.zip", bar.Add)
+
+	_, err := os.Stat(path.Join(destination, fName))
+	assert.Nil(t, err)
+	os.Remove(path.Join(destination, fName))
 }

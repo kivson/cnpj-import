@@ -1,6 +1,7 @@
 package importer
 
 import (
+	"os"
 	"testing"
 
 	"github.com/kivson/cnpj-import/model"
@@ -36,6 +37,8 @@ func TestImportFolder(t *testing.T) {
 	var count int64
 	db.Model(&model.Empresa{}).Count(&count)
 	assert.Equal(t, int64(10), count)
+
+	os.Remove("./test.db")
 }
 
 func BenchmarkInsertion(b *testing.B) {
